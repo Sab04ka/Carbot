@@ -112,7 +112,7 @@ bot.on('text', async ctx => {
             break
         case 2:
             ctx.session.tovar = ctx.update.message.text
-            ctx.reply('Спасибо, мы сверяем данные, ожидайте ответа')
+            ctx.reply('Спасибо, мы сверяем данные, ответ будет в течении 1-2 минут')
             search.push(ctx.update.message.text)
             Requests.updateOne({id: ctx.session.id}, {product: search}, function(err, result){
                 if(err) return console.log(err);
@@ -169,11 +169,11 @@ bot.on('callback_query', async ctx => {
         }
     } else if (ctx.update.callback_query.data == 'no'){
         ctx.deleteMessage()
-        ctx.reply('Cпасибо за использование нашего бота')
+        ctx.reply('Cпасибо за воспользовались нашими услугами')
     }
 })
 bot.on('contact', ctx => {
-    ctx.reply('Спасибо, ваша заявка принята', button_start)
+    ctx.reply('Спасибо, ваша заявка принята, менеджер свяжется с вами в течении 5 минут, ожидайте звонка.', button_start)
     console.log(ctx.update.message.contact.phone_number)
     User.updateOne({chatid: ctx.message.from.id}, {address: ctx.session.address, phone_num: ctx.update.message.contact.phone_number}, function(err, result){
         if(err) return console.log(err);
