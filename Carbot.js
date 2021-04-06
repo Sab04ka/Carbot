@@ -83,6 +83,7 @@ bot.on('text', async ctx => {
     switch(ctx.session.step){
         case 1:
             await ctx.reply('Секундочку, мы обрабатываем информацию')
+            ctx.session.step = 0
             ctx.session.auto = ctx.update.message.text
             await params.append('car_num', ctx.session.auto)
             const config = {
