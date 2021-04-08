@@ -35,9 +35,7 @@ const requestScheme = new Schema({ //создаем схемы для юзеро
 })
 const User = mongoose.model("User", userScheme)
 const Requests = mongoose.model("Request", requestScheme)
-
-let j = 1
-let tolkan, search = []
+let j = 1, tolkan, search = []
 
 const params = new URLSearchParams()
 const button_start = {
@@ -76,8 +74,12 @@ bot.start(async ctx => { //ответ бота а команду /start
     ctx.session.step = 0
 })
 bot.hears('Купить', async ctx => {
-    ctx.reply('Введите пожалуйста гос номер Авто:')
-    ctx.session.step = 1
+    if (ctx.session.step == 10){
+        ctx.reply('Извините, но на данный момент обрабатывается информация, мы вам напишем в течении 1-2 минут')
+    } else {
+        ctx.reply('Введите пожалуйста гос номер Авто:')
+        ctx.session.step = 1
+    }
 })
 bot.on('text', async ctx => {
     switch(ctx.session.step){
@@ -95,6 +97,7 @@ bot.on('text', async ctx => {
                 .then( async (result) => {
                 if(result.data.status == 'error'){
                     ctx.reply('Данные вашего автомобиля не найдены, пожалуйста повторите попытку:')
+                    ctx.session.step = 1
                 } else {
                     await ctx.reply("Данные о вашем автомобиле:\nМарка: " + result.data.real_brand + "\nМодель: " + result.data.real_model + "\nГод выпуска: " + result.data.date + '\nVIN код: ' + result.data.vin)
                     ctx.session.vin = result.data.vin
@@ -107,7 +110,7 @@ bot.on('text', async ctx => {
                 }
             })
                 .catch((err) => {
-                console.log(err)
+                    bot.telegram.sendMessage(822415241, err)
             })
             break
         case 2:
@@ -118,7 +121,7 @@ bot.on('text', async ctx => {
                 if(err) return console.log(err);
                 console.log(result);
             })
-            ctx.session.step = 0
+            ctx.session.step = 10
             start(ctx)
             break
         case 3:
@@ -169,7 +172,7 @@ bot.on('callback_query', async ctx => {
         }
     } else if (ctx.update.callback_query.data == 'no'){
         ctx.deleteMessage()
-        ctx.reply('Cпасибо за воспользовались нашими услугами')
+        ctx.reply('Cпасибо что воспользовались нашими услугами')
     }
 })
 bot.on('contact', ctx => {
@@ -207,7 +210,7 @@ async function start(ctx) {
                     if(name){
                         ctx.session.code.push(code)
                         console.log(code, name)
-                        await ctx.reply(j + ') ' + name, button_buy) 
+                        await ctx.reply(j + ') ' + name, button_buy)
                         j++
                     }
                 }
@@ -237,7 +240,7 @@ async function Token(){
         .then( async (result) => {
         tolkan = result.data.token
     }).catch(err => {
-        console.log(err)
+        bot.telegram.sendMessage(822415241, err)
     })
 }
 async function Sklad(ctx){
@@ -264,7 +267,7 @@ async function Sklad(ctx){
                 j = 1
             }
     }).catch(err => {
-        console.log(28, err)
+        bot.telegram.sendMessage(822415241, err)
     })
 }
 
